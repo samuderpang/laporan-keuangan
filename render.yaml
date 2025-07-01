@@ -1,5 +1,12 @@
+# render.yaml (Versi Perbaikan)
+
+databases:
+  - name: laporan-keuangan-db
+    databaseName: laporan_keuangan_db
+    user: laporan_keuangan_user
+    plan: free
+
 services:
-  # Web Service untuk Aplikasi Laravel
   - type: web
     name: laporan-keuangan-app
     runtime: php
@@ -31,8 +38,3 @@ services:
           property: internalConnectionString
       - key: DB_CONNECTION
         value: pgsql
-
-  # Database PostgreSQL
-  - type: psql
-    name: laporan-keuangan-db
-    plan: free
