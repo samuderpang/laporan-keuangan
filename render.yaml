@@ -1,0 +1,38 @@
+services:
+  # Web Service untuk Aplikasi Laravel
+  - type: web
+    name: laporan-keuangan-app
+    runtime: php
+    plan: free
+    buildCommand: |
+      composer install --no-dev --no-interaction --optimize-autoloader
+      npm install --production
+      npm run build
+      php artisan config:clear
+      php artisan route:clear
+      php artisan view:clear
+    startCommand: "php artisan serve --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /up
+    envVars:
+      - key: APP_URL
+        fromService:
+          type: web
+          name: laporan-keuangan-app
+          property: url
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: laporan-keuangan-db
+          property: internalConnectionString
+      - key: DB_CONNECTION
+        value: pgsql
+
+  # Database PostgreSQL
+  - type: psql
+    name: laporan-keuangan-db
+    plan: free
