@@ -1,40 +1,51 @@
-# render.yaml (Versi Perbaikan)
-
-databases:
-  - name: laporan-keuangan-db
-    databaseName: laporan_keuangan_db
-    user: laporan_keuangan_user
-    plan: free
+# render.yaml (Versi Final yang Diperbaiki)
 
 services:
+  # Web Service untuk Aplikasi Laravel
   - type: web
     name: laporan-keuangan-app
-    runtime: php
     plan: free
+    # 'runtime' dihapus agar Render deteksi otomatis dari composer.json
     buildCommand: |
-      composer install --no-dev --no-interaction --optimize-autoloader
+      composer install --no-dev
       npm install --production
       npm run build
       php artisan config:clear
-      php artisan route:clear
-      php artisan view:clear
-    startCommand: "php artisan serve --host 0.0.0.0 --port $PORT"
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
     healthCheckPath: /up
     envVars:
-      - key: APP_URL
-        fromService:
-          type: web
-          name: laporan-keuangan-app
-          property: url
       - key: APP_KEY
         generateValue: true
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
-      - key: DATABASE_URL
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: pgsql # Beritahu Laravel untuk menggunakan driver PostgreSQL
+      - key: DB_HOST # Diambil dari database service di bawah
         fromDatabase:
           name: laporan-keuangan-db
-          property: internalConnectionString
-      - key: DB_CONNECTION
-        value: pgsql
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: laporan-keuangan-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: laporan-keuangan-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: laporan-keuangan-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: laporan-keuangan-db
+          property: password
+
+  # Database PostgreSQL
+  - type: psql
+    name: laporan-keuangan-db
+    plan: free
