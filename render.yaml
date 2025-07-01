@@ -1,7 +1,13 @@
-# render.yaml (Versi Final yang Diperbaiki)
+# render.yaml - Versi Final yang Benar
+# Perhatikan 'databases' dan 'services' berada di level paling kiri (tidak menjorok)
+
+databases:
+  - name: laporan-keuangan-db
+    databaseName: laporan_keuangan_db
+    user: laporan_keuangan_user
+    plan: free
 
 services:
-  # Web Service untuk Aplikasi Laravel
   - type: web
     name: laporan-keuangan-app
     plan: free
@@ -14,6 +20,11 @@ services:
     startCommand: php artisan serve --host 0.0.0.0 --port $PORT
     healthCheckPath: /up
     envVars:
+      - key: APP_URL
+        fromService:
+          type: web
+          name: laporan-keuangan-app
+          property: url
       - key: APP_KEY
         generateValue: true
       - key: APP_ENV
@@ -23,8 +34,8 @@ services:
       - key: LOG_CHANNEL
         value: stderr
       - key: DB_CONNECTION
-        value: pgsql # Beritahu Laravel untuk menggunakan driver PostgreSQL
-      - key: DB_HOST # Diambil dari database service di bawah
+        value: pgsql
+      - key: DB_HOST
         fromDatabase:
           name: laporan-keuangan-db
           property: host
@@ -44,8 +55,3 @@ services:
         fromDatabase:
           name: laporan-keuangan-db
           property: password
-
-  # Database PostgreSQL
-  - type: psql
-    name: laporan-keuangan-db
-    plan: free
