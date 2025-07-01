@@ -1,14 +1,16 @@
-# render.yaml (Versi Paling Minimalis)
-services:
-  # Web Service PHP kosong
-  - type: web
-    name: laporan-keuangan-app
-    env: php
-    plan: free
-    buildCommand: "echo 'Build command akan diatur nanti'"
-    startCommand: "echo 'Start command akan diatur nanti'"
-
-# Database PostgreSQL kosong
+# render.yaml (Versi Final dengan Docker)
 databases:
   - name: laporan-keuangan-db
     plan: free
+
+services:
+  - type: web
+    name: laporan-keuangan-app
+    plan: free
+    runtime: docker         # <-- Perubahan Kunci: Menggunakan Docker
+    dockerfilePath: ./Dockerfile # <-- Menunjuk ke file resep kita
+    healthCheckPath: /up
+    envVars:
+      - key: PORT # Port internal Docker
+        value: 80
+      # Variabel lain akan kita atur manual di dashboard Render
