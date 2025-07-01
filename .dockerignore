@@ -1,10 +1,5 @@
-# Abaikan folder Git
 .git
 .github
-
-# Abaikan dependensi yang akan diinstal ulang di server
 node_modules
 vendor
-
-# Abaikan file environment lokal
 .env
