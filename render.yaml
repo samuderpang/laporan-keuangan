@@ -1,42 +1,14 @@
-# render.yaml (Versi Final yang Teruji)
-version: "1"
-
+# render.yaml (Versi Paling Minimalis)
 services:
-  # Web Service untuk Aplikasi Laravel
+  # Web Service PHP kosong
   - type: web
     name: laporan-keuangan-app
-    env: php # Menggunakan lingkungan PHP bawaan Render
+    env: php
     plan: free
-    buildCommand: |
-      composer install --no-dev --no-interaction --optimize-autoloader
-      npm install --production
-      npm run build
-      php artisan config:clear
-      php artisan route:clear
-      php artisan view:clear
-      php artisan migrate --force
-    startCommand: "php artisan serve --host 0.0.0.0 --port $PORT"
-    healthCheckPath: /up
-    envVars:
-      - key: APP_URL
-        fromService:
-          type: web
-          name: laporan-keuangan-app
-          property: url
-      - key: APP_KEY
-        generateValue: true
-      - key: APP_ENV
-        value: production
-      - key: APP_DEBUG
-        value: false
-      - key: DB_CONNECTION
-        value: pgsql
-      - key: DATABASE_URL # Ini akan otomatis terhubung ke database kita
-        fromDatabase:
-          name: laporan-keuangan-db
-          property: connectionString
+    buildCommand: "echo 'Build command akan diatur nanti'"
+    startCommand: "echo 'Start command akan diatur nanti'"
 
-# Database PostgreSQL
+# Database PostgreSQL kosong
 databases:
   - name: laporan-keuangan-db
     plan: free
