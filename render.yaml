@@ -1,23 +1,21 @@
-# render.yaml - Versi Final yang Benar
-# Perhatikan 'databases' dan 'services' berada di level paling kiri (tidak menjorok)
-
-databases:
-  - name: laporan-keuangan-db
-    databaseName: laporan_keuangan_db
-    user: laporan_keuangan_user
-    plan: free
+# render.yaml (Versi Final yang Teruji)
+version: "1"
 
 services:
+  # Web Service untuk Aplikasi Laravel
   - type: web
     name: laporan-keuangan-app
+    env: php # Menggunakan lingkungan PHP bawaan Render
     plan: free
-    # 'runtime' dihapus agar Render deteksi otomatis dari composer.json
     buildCommand: |
-      composer install --no-dev
+      composer install --no-dev --no-interaction --optimize-autoloader
       npm install --production
       npm run build
       php artisan config:clear
-    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+      php artisan route:clear
+      php artisan view:clear
+      php artisan migrate --force
+    startCommand: "php artisan serve --host 0.0.0.0 --port $PORT"
     healthCheckPath: /up
     envVars:
       - key: APP_URL
@@ -31,27 +29,14 @@ services:
         value: production
       - key: APP_DEBUG
         value: false
-      - key: LOG_CHANNEL
-        value: stderr
       - key: DB_CONNECTION
         value: pgsql
-      - key: DB_HOST
+      - key: DATABASE_URL # Ini akan otomatis terhubung ke database kita
         fromDatabase:
           name: laporan-keuangan-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: laporan-keuangan-db
-          property: port
-      - key: DB_DATABASE
-        fromDatabase:
-          name: laporan-keuangan-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: laporan-keuangan-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: laporan-keuangan-db
-          property: password
+          property: connectionString
+
+# Database PostgreSQL
+databases:
+  - name: laporan-keuangan-db
+    plan: free
