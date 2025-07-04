@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->boolean('is_expense')->default(false);
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
