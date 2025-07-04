@@ -5,7 +5,7 @@
 
 app = 'laporan-keuangan'
 primary_region = 'sin'
-release_command = "php artisan migrate --force"
+release_command = "php artisan migrate --force && php artisan storage:link"
 console_command = 'php /var/www/html/artisan tinker'
 
 [build]
