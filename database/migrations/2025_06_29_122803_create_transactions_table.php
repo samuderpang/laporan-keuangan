@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('date');
             $table->integer('amount');
             $table->string('note');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }
