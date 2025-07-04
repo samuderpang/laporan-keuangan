@@ -22,12 +22,12 @@ export default defineConfig({
                 start_url: '/admin', // Halaman pertama yang dibuka
                 icons: [
                     {
-                        src: 'images/icons/icon-192x192.png',
+                        src: 'public/images/icons/icon-192x192.png',
                         sizes: '192x192',
                         type: 'image/png'
                     },
                     {
-                        src: 'images/icons/icon-512x512.png',
+                        src: 'public/images/icons/icon-512x512.png',
                         sizes: '512x512',
                         type: 'image/png'
                     }
