@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
         Schema::table('transactions', function (Blueprint $table) {
-            //
-        });
+        // Pindahkan ke dalam sini
+        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+    });
     }
 
     /**
@@ -22,8 +22,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('transactions', function (Blueprint $table) {
-            //
-        });
+       Schema::table('transactions', function (Blueprint $table) {
+        // Perintah untuk menghapus foreign key saat rollback
+        $table->dropForeign(['user_id']);
+        $table->dropColumn('user_id');
+    });
     }
 };
