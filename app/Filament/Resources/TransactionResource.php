@@ -67,7 +67,7 @@ class TransactionResource extends Resource
                     ->money('IDR')
                     ->sortable(),
 
-                Tables\Columns\ImageColumn::make('image'),
+                #Tables\Columns\ImageColumn::make('image'),
                 
                 Tables\Columns\TextColumn::make('date')
                     ->date()
