@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransactionResource\Pages;
-use App\Filament\Resources\TransactionResource\RelationManagers;
 use App\Models\Transaction;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,8 +10,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder; // <-- Pastikan ini ada di atas
 
 class TransactionResource extends Resource
 {
@@ -24,67 +21,57 @@ class TransactionResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('category_id')
+                    ->relationship('category', 'name')
+                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category','name')
-                    ->required(),
                 Forms\Components\DatePicker::make('date')
                     ->required(),
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('note')
-                    ->required()
-                    ->maxLength(255),
-               
+                Forms\Components\FileUpload::make('image') // <-- Tambahkan komponen untuk upload gambar
+                    ->image()
+                    ->disk('public'), // Simpan di disk 'public'
+                Forms\Components\Textarea::make('note') // <-- Gunakan Textarea untuk note agar lebih luas
+                    ->columnSpanFull(),
             ]);
     }
-public static function getEloquentQuery(): EloquentBuilder
-{
-    return parent::getEloquentQuery()->where('user_id', auth()->id());
-}
 
-protected static function mutateFormDataBeforeCreate(array $data): array
-{
-    $data['user_id'] = auth()->id();
-    return $data;
-}
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('category.image')
-                ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Transaksi')
+                    ->searchable()
+                    ->description(fn (Transaction $record): string => $record->note ?? 'Tidak ada catatan'),
+                
                 Tables\Columns\TextColumn::make('category.name')
-                 ->description(fn (Transaction $record): string => $record->name)
-                 ->label('Transaction'),
+                    ->label('Kategori')
+                    ->searchable()
+                    ->sortable(),
+
                 Tables\Columns\IconColumn::make('category.is_expense')
-                ->label('Tipe')
-                ->trueIcon('heroicon-o-arrow-up-circle')
-                ->falseIcon('heroicon-o-arrow-down-circle')
-                ->trueColor('danger')
-                ->falseColor('success')
-                 ->boolean(),
+                    ->label('Tipe')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-arrow-up-circle')
+                    ->falseIcon('heroicon-o-arrow-down-circle')
+                    ->trueColor('danger')
+                    ->falseColor('success'),
+
+                Tables\Columns\TextColumn::make('amount')
+                    ->numeric()
+                    ->money('IDR')
+                    ->sortable(),
+
+                Tables\Columns\ImageColumn::make('image'),
                 
                 Tables\Columns\TextColumn::make('date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
-                    ->money('IDR',  locale: 'id')
-                    ->sortable(),
-                
-                
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -99,6 +86,19 @@ protected static function mutateFormDataBeforeCreate(array $data): array
             ]);
     }
 
+    // Method untuk memfilter data agar hanya menampilkan milik user yang login
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('user_id', auth()->id());
+    }
+
+    // Method untuk otomatis mengisi 'user_id' saat membuat data baru
+    protected static function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['user_id'] = auth()->id();
+        return $data;
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -110,11 +110,9 @@ protected static function mutateFormDataBeforeCreate(array $data): array
     {
         return [
             'index' => Pages\ListTransactions::route('/'),
-        'create' => Pages\CreateTransaction::route('/create'),
-        'report' => Pages\MonthlyReport::route('/report'), // <-- TAMBAHKAN INI
-        'edit' => Pages\EditTransaction::route('/{record}/edit'),
+            'create' => Pages\CreateTransaction::route('/create'),
+            'report' => Pages\MonthlyReport::route('/report'),
+            'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
-
-        
     }
 }

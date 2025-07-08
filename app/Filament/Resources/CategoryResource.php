@@ -3,15 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
-use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CategoryResource extends Resource
 {
@@ -26,12 +23,12 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Toggle::make('is_expense')
-                ->default(false),
-                    
+                Forms\Components\Toggle::make('is_expense') // <-- Perbaikan dari 'is_expanse'
+                    ->label('Apakah ini Pengeluaran?')
+                    ->default(false),
                 Forms\Components\FileUpload::make('image')
                     ->image()
-                    ->required(),
+                    ->disk('public'), // Pastikan disimpan di disk public
             ]);
     }
 
@@ -44,28 +41,13 @@ class CategoryResource extends Resource
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_expense')
                     ->label('Tipe')
+                    ->boolean()
                     ->trueIcon('heroicon-o-arrow-up-circle')
                     ->falseIcon('heroicon-o-arrow-down-circle')
                     ->trueColor('danger')
-                    ->falseColor('success')
-                    ->boolean(),
-                Tables\Columns\ImageColumn::make('image'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->falseColor('success'),
+                // Kolom 'image' yang duplikat sudah dihapus
             ])
-
-            
-            
             ->filters([
                 //
             ])
