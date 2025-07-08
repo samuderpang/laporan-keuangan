@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder; // <-- Pastikan ini ada di atas
 
 class TransactionResource extends Resource
 {
@@ -40,7 +41,16 @@ class TransactionResource extends Resource
                
             ]);
     }
+public static function getEloquentQuery(): EloquentBuilder
+{
+    return parent::getEloquentQuery()->where('user_id', auth()->id());
+}
 
+protected static function mutateFormDataBeforeCreate(array $data): array
+{
+    $data['user_id'] = auth()->id();
+    return $data;
+}
     public static function table(Table $table): Table
     {
         return $table
@@ -104,5 +114,7 @@ class TransactionResource extends Resource
         'report' => Pages\MonthlyReport::route('/report'), // <-- TAMBAHKAN INI
         'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
+
+        
     }
 }

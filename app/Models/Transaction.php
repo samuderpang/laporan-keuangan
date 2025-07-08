@@ -10,6 +10,11 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
     protected $fillable = [
         'name',
         'category_id',
@@ -17,6 +22,7 @@ class Transaction extends Model
         'amount',
         'note',
         'image',
+        'user_id',
     ];
 
         public function category(): BelongsTo
